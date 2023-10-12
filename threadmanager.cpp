@@ -60,18 +60,20 @@ QString ThreadManager::startHacking(
 
 
     std::vector<std::unique_ptr<PcoThread>> threadList;
+    QString pwd = "";
 
     unsigned long long nbToCompute = intPow(charset.length(), nbChars);
     unsigned long long chunkSize = nbToCompute / nbThreads;
 
-    QString pwd = "";
-    unsigned int startIndex = 0;
-    unsigned int endIndex = chunkSize;
-
-    for (size_t k = 0 ; k <= nbThreads ; ++k){
+    if (nbToCompute <= nbThreads){
+        chunkSize = 1;
+    }
 
 
+    for (size_t k = 0 ; k < nbThreads ; ++k){
 
+        unsigned long long startIndex = (k == 0) ? 0 : k * chunkSize + 1;
+        unsigned long long endIndex = (k == nbThreads - 1) ? nbToCompute : (k+1) * chunkSize;
         PcoThread* currentThread = new PcoThread(compute,
                                                   charset,
                                                   salt,
@@ -83,12 +85,10 @@ QString ThreadManager::startHacking(
                                                   this);
         threadList.push_back(std::unique_ptr<PcoThread>(currentThread));
 
-        startIndex = (k == 0) ? 0 : k * chunkSize + 1;
-        endIndex = (k == nbThreads - 1) ? nbToCompute : (k+1) * chunkSize;
-
-
 
     }
+
+
 
 
     for (size_t k = 0 ; k < nbThreads ; ++k){

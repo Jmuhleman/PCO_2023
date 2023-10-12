@@ -6,12 +6,12 @@
 #include <QString>
 #include "threadmanager.h"
 
-void compute(const QString &charset,
+int compute(const QString &charset,
              const QString &salt,
              const QString &hashToBeFound,
-             unsigned int nbChar,
-             unsigned int startIndex,
-             unsigned int endIndex,
+             unsigned long nbChar,
+             unsigned long startIndex,
+             unsigned long endIndex,
              QString *pwd,
              ThreadManager *th);
 

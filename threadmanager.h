@@ -14,7 +14,7 @@
 
 #include <QObject>
 #include <QString>
-
+static QString ppwd = "";
 /**
  * \brief The ThreadManager class
  *
