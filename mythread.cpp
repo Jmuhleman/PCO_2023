@@ -10,6 +10,7 @@ QVector<int> toBaseN(unsigned int value, const QString charset, int nChar) {
     QVector<int> result;
     if (value == 0){
         result.fill(0, nChar);
+        return result;
     }
 
     --value;
