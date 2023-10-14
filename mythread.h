@@ -9,11 +9,12 @@
 int compute(const QString &charset,
              const QString &salt,
              const QString &hashToBeFound,
-             unsigned long nbChar,
-             unsigned long startIndex,
-             unsigned long endIndex,
+             long long unsigned int nbChar,
+             long long unsigned int startIndex,
+             long long unsigned intendIndex,
              QString *pwd,
-             ThreadManager *th);
+             ThreadManager *th,
+             long long unsigned int nbTocompute);
 
 
 

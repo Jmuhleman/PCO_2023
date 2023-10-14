@@ -34,15 +34,16 @@ QVector<int> toBaseN(unsigned long value, const QString charset, int nChar) {
 
 
 
-
 int compute(const QString &charset,
              const QString &salt,
              const QString &hashToBeFound,
-             unsigned long nbChar,
-             unsigned long startIndex,
-             unsigned long endIndex,
+             long long unsigned int nbChar,
+             long long unsigned int startIndex,
+             long long unsigned int endIndex,
              QString *pwd,
-             ThreadManager *th){
+             ThreadManager *th,
+             long long unsigned int nbToCompute){
+
 
     QCryptographicHash md5(QCryptographicHash::Md5);
     QString currentHash;
@@ -50,7 +51,8 @@ int compute(const QString &charset,
     QString currentPasswordString;
 
     unsigned int i;
-    unsigned int currentIndex = startIndex;
+    long long unsigned int currentIndex = startIndex;
+
     if (nbChar > 1){
         currentPasswordString.fill(charset.at(0), nbChar);
     }
@@ -59,18 +61,29 @@ int compute(const QString &charset,
         ++endIndex;
     }
 
-    while (currentIndex <= endIndex) {
-        md5.reset();
-        md5.addData(salt.toLatin1());
-        md5.addData(currentPasswordString.toLatin1());
-        currentHash = md5.result().toHex();
 
+
+    md5.reset();
+    md5.addData(salt.toLatin1());
+    md5.addData(currentPasswordString.toLatin1());
+    currentHash = md5.result().toHex();
+
+    if (currentHash == hashToBeFound){
+        *pwd = currentPasswordString;
+        return 0;
+    }
+
+    while (currentIndex <= endIndex && *pwd == "") {
 
         for (i=0 ; i < nbChar ; i++){
             currentPasswordString[i]  = charset.at(currentPasswordArray.at(i));
         }
 
 
+        md5.reset();
+        md5.addData(salt.toLatin1());
+        md5.addData(currentPasswordString.toLatin1());
+        currentHash = md5.result().toHex();
 
         if (currentHash == hashToBeFound){
             *pwd = currentPasswordString;
@@ -80,7 +93,7 @@ int compute(const QString &charset,
 
         if (((endIndex - currentIndex) % 1000) == 0) {
 
-              th->incrementPercentComputed((double)1000/(endIndex - currentIndex));
+              th->incrementPercentComputed((double)1000/(nbToCompute));
         }
 
         i = 0;
@@ -100,7 +113,7 @@ int compute(const QString &charset,
 
     }
 
-return -1;
+return 0;
 }
 
 
