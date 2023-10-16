@@ -62,9 +62,13 @@ QString ThreadManager::startHacking(
     std::vector<std::unique_ptr<PcoThread>> threadList;
     QString pwd = "";
 
+    //nous utilisons deux bornes de début et de fin calculées pour chaque thread
+    //qui seront converties par la suite en base 66 qui est la taille du charset.
     long long unsigned int nbToCompute = intPow(charset.length(), nbChars);
     long long unsigned int chunkSize = nbToCompute / nbThreads;
 
+    //Si nous avons moins d'un mot de passe par thread.
+    //Alors nous assignons 1 mot de passe par thread et nous posons une limite au nombre de thread.
     if (nbToCompute <= nbThreads){
         chunkSize = 1;
     }
@@ -72,6 +76,7 @@ QString ThreadManager::startHacking(
 
     for (size_t k = 0 ; k < nbThreads ; ++k){
 
+        //Calcul de chaque borne de début et de fin pour chaque thread.
         long long unsigned int startIndex = (k == 0) ? 0 : k * chunkSize + 1;
         long long unsigned int endIndex = (k == nbThreads - 1) ? nbToCompute : (k+1) * chunkSize;
         PcoThread* currentThread = new PcoThread(compute,
@@ -85,9 +90,6 @@ QString ThreadManager::startHacking(
                                                   this,
                                                  nbToCompute);
         threadList.push_back(std::unique_ptr<PcoThread>(currentThread));
-        if (pwd != "")
-            break;
-
 
     }
 
