@@ -3,6 +3,10 @@
 
 void Utils::endService() {
     // TODO
+
+    for (size_t k = 0 ; k < threads.size() ; ++k){
+        threads[k]->requestStop();
+    }
     std::cout << "It's time to end !" << std::endl;
 }
 
