@@ -52,7 +52,6 @@ void Wholesale::buyResources() {
         money -= price;
         stocks[i] += qty;
     }
-
 }
 
 void Wholesale::run() {
@@ -93,7 +92,6 @@ int Wholesale::trade(ItemType it, int qty) {
     stocks[it] -= qty;
     money += getCostPerUnit(it) * qty;
     return getCostPerUnit(it) * qty;
-
 }
 
 void Wholesale::setInterface(WindowInterface *windowInterface) {

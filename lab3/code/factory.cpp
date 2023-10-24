@@ -74,13 +74,18 @@ void Factory::orderResources() {
     //auto resourceToBeBought = std::min_element(stocks.begin(), stocks.end());
     for (auto k : resourcesNeeded){
         for (auto j : wholesalers){
+             int qty = rand() % 5 + 1;
+             int price = j->trade(k, qty);
 
-            j->trade(k, 3);
-            PcoThread::usleep(10 * 100000);
-            //Temps de pause pour éviter trop de demande
+             if (price){
+                 money -= price;
+                 stocks[k] += qty;
+             }
+
+             PcoThread::usleep(10 * 100000);
+             //Temps de pause pour éviter trop de demande
         }
     }
-
 }
 
 void Factory::run() {
@@ -113,10 +118,9 @@ int Factory::trade(ItemType it, int qty) {
         return 0;
     }
     //MAJ des stocks du vendeur.
-    stocks[it] -= qty;
+    stocks[itemBuilt] -= qty;
     money += getCostPerUnit(it) * qty;
     return getCostPerUnit(it) * qty;
-
 }
 
 int Factory::getAmountPaidToWorkers() {

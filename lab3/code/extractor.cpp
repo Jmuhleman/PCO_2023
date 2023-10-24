@@ -22,9 +22,14 @@ std::map<ItemType, int> Extractor::getItemsForSale() {
 
 int Extractor::trade(ItemType it, int qty) {
     // TODO
-
-
-    return 0;
+    //Vérification des paramètres
+    if (it != resourceExtracted || qty <= 0 || stocks[it] < qty){
+        return 0;
+    }
+    //MAJ des stocks du vendeur.
+    stocks[it] -= qty;
+    money += getCostPerUnit(it) * qty;
+    return getCostPerUnit(it) * qty;
 }
 
 void Extractor::run() {
