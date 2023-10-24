@@ -83,7 +83,6 @@ void Factory::orderResources() {
 
 }
 
-
 void Factory::run() {
     if (wholesalers.empty()) {
         std::cerr << "You have to give to factories wholesalers to sales their resources" << std::endl;

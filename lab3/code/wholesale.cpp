@@ -3,6 +3,7 @@
 #include "costs.h"
 #include <iostream>
 #include <pcosynchro/pcothread.h>
+#include <algorithm>
 
 WindowInterface* Wholesale::interface = nullptr;
 
@@ -38,6 +39,20 @@ void Wholesale::buyResources() {
     interface->consoleAppendText(uniqueId, QString("I would like to buy %1 of ").arg(qty) %
                                  getItemName(i) % QString(" which would cost me %1").arg(price));
     /* TODO */
+
+    if (money < price){
+        //Si on est trop pauvre pour acheter => retour dans la boucle
+        //On attend que quelqu'un nous achète quelque-chose pour avoir
+        //des fonds.
+        return;
+    }
+    //On place un ordre d'achat chez le seller choisi.
+    if (s->trade(i, qty)){
+        //Si l'achat se conclut, on met à jour les stocks.
+        money -= price;
+        stocks[i] += qty;
+    }
+
 }
 
 void Wholesale::run() {
@@ -67,8 +82,18 @@ std::map<ItemType, int> Wholesale::getItemsForSale() {
 int Wholesale::trade(ItemType it, int qty) {
 
     // TODO
+    //Vérification des paramètres
+    if (std::find_if(stocks.begin(), stocks.end(),
+                     [=](const std::pair<ItemType, int>& k)->bool
+                                     {return k.first == it;}) == stocks.end()
+                                                    || qty <= 0 || stocks[it] < qty){
+        return 0;
+    }
+    //MAJ des stocks du vendeur.
+    stocks[it] -= qty;
+    money += getCostPerUnit(it) * qty;
+    return getCostPerUnit(it) * qty;
 
-    return 0;
 }
 
 void Wholesale::setInterface(WindowInterface *windowInterface) {
