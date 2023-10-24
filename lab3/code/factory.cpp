@@ -5,6 +5,7 @@
 #include <pcosynchro/pcothread.h>
 #include <iostream>
 #include <algorithm>
+#include <pcosynchro/pcomutex.h>
 
 WindowInterface* Factory::interface = nullptr;
 
@@ -89,6 +90,7 @@ void Factory::orderResources() {
 }
 
 void Factory::run() {
+    PcoMutex mutex;
     if (wholesalers.empty()) {
         std::cerr << "You have to give to factories wholesalers to sales their resources" << std::endl;
         return;
@@ -96,6 +98,7 @@ void Factory::run() {
     interface->consoleAppendText(uniqueId, "[START] Factory routine");
 
     while (!PcoThread::thisThread()->stopRequested()) {
+        mutex.lock();
         if (verifyResources()) {
             buildItem();
         } else {
@@ -103,6 +106,7 @@ void Factory::run() {
         }
         interface->updateFund(uniqueId, money);
         interface->updateStock(uniqueId, &stocks);
+        mutex.unlock();
     }
     interface->consoleAppendText(uniqueId, "[STOP] Factory routine");
 }

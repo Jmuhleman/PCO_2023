@@ -59,10 +59,12 @@ void Extractor::run() {
         /* Message dans l'interface graphique */
         interface->consoleAppendText(uniqueId, QString("1 ") % getItemName(resourceExtracted) %
                                      " has been mined");
-        mutex.unlock();
         /* Update de l'interface graphique */
         interface->updateFund(uniqueId, money);
         interface->updateStock(uniqueId, &stocks);
+
+        mutex.unlock();
+
     }
     interface->consoleAppendText(uniqueId, "[STOP] Mine routine");
 }

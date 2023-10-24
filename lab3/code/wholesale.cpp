@@ -4,6 +4,7 @@
 #include <iostream>
 #include <pcosynchro/pcothread.h>
 #include <algorithm>
+#include <pcosynchro/pcomutex.h>
 
 WindowInterface* Wholesale::interface = nullptr;
 
@@ -55,6 +56,7 @@ void Wholesale::buyResources() {
 }
 
 void Wholesale::run() {
+    PcoMutex mutex;
 
     if (sellers.empty()) {
         std::cerr << "You have to give factories and mines to a wholeseler before launching is routine" << std::endl;
@@ -63,9 +65,11 @@ void Wholesale::run() {
 
     interface->consoleAppendText(uniqueId, "[START] Wholesaler routine");
     while (!PcoThread::thisThread()->stopRequested()) {
+        mutex.lock();
         buyResources();
         interface->updateFund(uniqueId, money);
         interface->updateStock(uniqueId, &stocks);
+        mutex.unlock();
         //Temps de pause pour espacer les demandes de ressources
         PcoThread::usleep((rand() % 10 + 1) * 100000);
     }
