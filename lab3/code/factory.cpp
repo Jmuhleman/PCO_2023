@@ -4,6 +4,7 @@
 #include "wholesale.h"
 #include <pcosynchro/pcothread.h>
 #include <iostream>
+#include <algorithm>
 
 WindowInterface* Factory::interface = nullptr;
 
@@ -48,10 +49,19 @@ bool Factory::verifyResources() {
 void Factory::buildItem() {
 
     // TODO
+    int proloCost = getEmployeeSalary(getEmployeeThatProduces(itemBuilt));
 
+    if (proloCost > money){
+        //Si on est pauvre, on ne pourra ni construire ni commander
+        //des ressources. Il faut attendre que quelqu'un nous achète des trucs.
+        //=>retour dans la boucle..
+        return;
+    }
+    money -= proloCost;
     //Temps simulant l'assemblage d'un objet.
     PcoThread::usleep((rand() % 100) * 100000);
-
+    ++nbBuild;
+    stocks[itemBuilt] += 1;
     // TODO
 
     interface->consoleAppendText(uniqueId, "Factory have build a new object");
@@ -60,9 +70,16 @@ void Factory::buildItem() {
 void Factory::orderResources() {
 
     // TODO - Itérer sur les resourcesNeeded et les wholesalers disponibles
+    //Trouver la resource à commander en priorité.
+    //auto resourceToBeBought = std::min_element(stocks.begin(), stocks.end());
+    for (auto k : resourcesNeeded){
+        for (auto j : wholesalers){
 
-    //Temps de pause pour éviter trop de demande
-    PcoThread::usleep(10 * 100000);
+            j->trade(k, 3);
+            PcoThread::usleep(10 * 100000);
+            //Temps de pause pour éviter trop de demande
+        }
+    }
 
 }
 
@@ -73,7 +90,7 @@ void Factory::run() {
     }
     interface->consoleAppendText(uniqueId, "[START] Factory routine");
 
-    while (true /* TODO terminaison*/) {
+    while (!PcoThread::thisThread()->stopRequested()) {
         if (verifyResources()) {
             buildItem();
         } else {
@@ -91,7 +108,15 @@ std::map<ItemType, int> Factory::getItemsForSale() {
 
 int Factory::trade(ItemType it, int qty) {
     // TODO
-    return 0;
+    //Vérification des paramètres
+    if (it != itemBuilt || qty <= 0 || stocks[it] < qty){
+        return 0;
+    }
+    //MAJ des stocks du vendeur.
+    stocks[it] -= qty;
+    money += getCostPerUnit(it) * qty;
+    return getCostPerUnit(it) * qty;
+
 }
 
 int Factory::getAmountPaidToWorkers() {

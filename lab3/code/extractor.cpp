@@ -23,6 +23,7 @@ std::map<ItemType, int> Extractor::getItemsForSale() {
 int Extractor::trade(ItemType it, int qty) {
     // TODO
 
+
     return 0;
 }
 
@@ -30,7 +31,7 @@ void Extractor::run() {
     interface->consoleAppendText(uniqueId, "[START] Mine routine");
     PcoMutex mutex;
 
-    while (true /* TODO terminaison*/) {
+    while (!PcoThread::thisThread()->stopRequested()) {
         /* TODO concurrence */
 
         int minerCost = getEmployeeSalary(getEmployeeThatProduces(resourceExtracted));
