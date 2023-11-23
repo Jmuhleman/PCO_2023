@@ -21,14 +21,16 @@
 static Locomotive locoA(0 /* Numéro (pour commande trains sur maquette réelle) */, 14 /* Vitesse */);
 // Locomotive B
 static Locomotive locoB(1 /* Numéro (pour commande trains sur maquette réelle) */, 12 /* Vitesse */);
+
+//Selon indication du professeur déclaration en static pour avoir accès depuis la fonction emergency_stop()
 static std::unique_ptr<LocomotiveBehavior> locoBehaveA;
 static std::unique_ptr<LocomotiveBehavior> locoBehaveB;
 //Arret d'urgence
 void emergency_stop()
 {
     // TODO
-    locoA.fixerVitesse(0);
-    locoB.fixerVitesse(0);
+    locoA.arreter();
+    locoB.arreter();
     locoBehaveA->stopRequest();
     locoBehaveB->stopRequest();
     afficher_message("\nSTOP!");
@@ -105,6 +107,7 @@ int cmain()
 
     // Création de la section partagée
     std::shared_ptr<SynchroInterface> sharedSection = std::make_shared<Synchro>();
+    //itinéraire des locos
     std::vector<int> parcoursA = {30, 28, 16, 15};
     std::vector<int> parcoursB = {34, 32, 16, 15};
 

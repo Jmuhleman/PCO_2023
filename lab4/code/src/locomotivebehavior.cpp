@@ -37,32 +37,12 @@ void LocomotiveBehavior::run()
             sharedSection->access(loco);
 
             attendre_contact(parcours.at(2));
-            //puisque le numéro de la loco correspond à sa direction hehe
+            //puisque le numéro de la loco correspond à l'inverse de sa direction hehe ;)
             diriger_aiguillage(8, !loco.numero(), 0);
 
             attendre_contact(parcours.at(3));
             sharedSection->leave(loco);
     }
-        /* loco 0
-            if (PcoThread::thisThread()->stopRequested()){
-                loco.arreter();
-                return;
-            }
-            attendre_contact(30);
-            sharedSection->stopAtStation(loco);
-
-            attendre_contact(28);
-            sharedSection->access(loco);
-
-
-            attendre_contact(16);
-            diriger_aiguillage(8, 1, 0);
-
-            attendre_contact(15);
-            sharedSection->leave(loco);
-*/
-
-
 }
 
 void LocomotiveBehavior::stopRequest(){

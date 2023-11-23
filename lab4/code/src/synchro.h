@@ -76,22 +76,19 @@ public:
      */
     void access(Locomotive &loco) override {
         // TODO
-        afficher_message(qPrintable(QString("ENTREE ACESS: %1 .").arg(loco.numero())));
-
         mutexA->acquire();
-        if (!section_busy && loco.priority){//si c'est libre et que l'on a le droit
-                                            //d'accéder on rentre
+        if (!section_busy && loco.priority){
+            //si c'est libre et que l'on a le droit d'accéder
             section_busy = true;
             mutexA->release();
         }
-        else {//si c'est occupé
+        else {//si c'est occupé on attend à l'entrée
             loco.arreter();
             in_queue = true;
-            afficher_message(qPrintable(QString("AVANT BLOQUE  %1 .").arg(loco.numero())));
             mutexA->release();
 
             waitingSecCritique->acquire();
-            //attente de 5 à 10" avant redémarrage => ne pas faire vomir les passagers
+            //attente de 2 à 6" avant redémarrage => ne pas faire vomir les passagers
             PcoThread::usleep((rand() % 5 + 2) * 100000);
             loco.demarrer();
         }
@@ -108,12 +105,10 @@ public:
         // TODO
         mutexL->acquire();
         section_busy = false;
-        if (in_queue){ //Si une loco attend
-
+        if (in_queue){ //Si une loco attend on la laisse entrer
             waitingSecCritique->release();
             in_queue = false;
         }
-        afficher_message(qPrintable(QString("SORTIE ACESS: %1 .").arg(loco.numero())));
         mutexL->release();
     }
 
@@ -128,34 +123,31 @@ public:
     void stopAtStation(Locomotive& loco) override {
         // TODO
         if (!locoIsWaitingInStation){
-            //si on est la première loco à arriver en gare => on attend
             mutexG->acquire();
             locoIsWaitingInStation = true;
             mutexG->release();
 
             loco.arreter();
-
+            //si on est la première loco à arriver en gare => on attend
             waitingGare->acquire();
 
             mutexG->acquire();
             locoIsWaitingInStation = false;
             mutexG->release();
-
+            //comme on est premier alors on sera pas prioritaire sur la section critique
             loco.priority = 0;
             loco.demarrer();
         }else{
-            //lorsque la deuxième arrive => débloquer l'autre après 5"
+            //on s'arrête pour laisser le temps au passagers
             loco.arreter();
             PcoThread::usleep(5000000);
             loco.demarrer();
+
+            //débloquer l'autre après 5"
             waitingGare->release();
+            //on a la priorité puisque on est deuxième
             loco.priority = 1;
-
-            //mettre la priorité à 1 (prioritaire) à la deuxième loco
         }
-
-        // Exemple de message dans la console globale
-        afficher_message(qPrintable(QString("The engine no. %1 arrives at the station.").arg(loco.numero())));
     }
 
 

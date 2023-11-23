@@ -57,7 +57,7 @@ protected:
      * @brief sharedSection Pointeur sur la section partagée
      */
     std::shared_ptr<SynchroInterface> sharedSection;
-
+    //on utilise un parcours pour être 'un peu' générique... ;)
     std::vector<int> parcours;
 
     /*
