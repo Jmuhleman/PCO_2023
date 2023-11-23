@@ -26,24 +26,24 @@ void LocomotiveBehavior::run()
     int locoActuel = loco.numero();
 
 
+    loco.priority = 1;
+
         while (locoActuel == 1){ //loco bleue
             if (PcoThread::thisThread()->stopRequested()){
                 loco.arreter();
                 return;
             }
-            attendre_contact(25);
+            attendre_contact(34);
+            sharedSection->stopAtStation(loco);
+
+            attendre_contact(32);
             sharedSection->access(loco);
 
             attendre_contact(16);
-            afficher_message(qPrintable(QString("APRES CONTACT 16 %1 .").arg(loco.numero())));
-
             diriger_aiguillage(8, !devie, 0);
 
             attendre_contact(15);
             sharedSection->leave(loco);
-
-            sharedSection->stopAtStation(this->loco);
-
 
         }
         while (locoActuel == 0) {
@@ -51,24 +51,21 @@ void LocomotiveBehavior::run()
                 loco.arreter();
                 return;
             }
+            attendre_contact(30);
+            sharedSection->stopAtStation(loco);
 
-            attendre_contact(22);
+            attendre_contact(28);
             sharedSection->access(loco);
 
 
             attendre_contact(16);
-            afficher_message(qPrintable(QString("APRES CONTACT 16 %1 .").arg(loco.numero())));
-
             diriger_aiguillage(8, devie, 0);
 
             attendre_contact(15);
             sharedSection->leave(loco);
 
 
-
         }
-
-
 }
 
 void LocomotiveBehavior::stopRequest(){

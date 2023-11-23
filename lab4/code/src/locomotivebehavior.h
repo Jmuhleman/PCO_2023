@@ -26,7 +26,7 @@ public:
      */
     LocomotiveBehavior(Locomotive& loco, std::shared_ptr<SynchroInterface> sharedSection /*, autres paramètres éventuels */) : loco(loco), sharedSection(sharedSection) {
         // Eventuel code supplémentaire du constructeur
-        priority = 0;
+        priority = 1;
     }
 
     void stopRequest();

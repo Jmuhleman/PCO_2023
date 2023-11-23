@@ -13,6 +13,7 @@
 #include <QDebug>
 
 #include <pcosynchro/pcosemaphore.h>
+#include <pcosynchro/pcothread.h>
 
 #include "locomotive.h"
 #include "ctrain_handler.h"
@@ -30,12 +31,14 @@ private:
     // Méthodes privées ...
 
     // Attribut privés ...
-    PcoSemaphore *waiting;
+    PcoSemaphore *waitingSecCritique;
     PcoSemaphore *mutexA;
     PcoSemaphore *mutexL;
-
+    PcoSemaphore *waitingGare;
+    PcoSemaphore *mutexG;
     bool section_busy;
     bool in_queue;
+    bool locoIsWaitingInStation;
 
 public:
 
@@ -45,18 +48,23 @@ public:
      */
     Synchro() {
         // TODO
-        waiting = new PcoSemaphore{0};
-        mutexA = new PcoSemaphore {1};
-        mutexL = new PcoSemaphore {1};
-
+        waitingSecCritique = new PcoSemaphore{0}; //pour attente en section critique
+        waitingGare = new PcoSemaphore{0}; //pour attente en gare
+        mutexG = new PcoSemaphore{1}; // protection des données dans stopAtStation
+        mutexA = new PcoSemaphore {1}; //protection des données dans access
+        mutexL = new PcoSemaphore {1}; //protection des données dans leave
+        locoIsWaitingInStation = false;
         section_busy = false;
         in_queue = false;
+
     }
 
     ~Synchro(){
-        delete waiting;
+        delete waitingSecCritique;
         delete mutexA;
         delete mutexL;
+        delete mutexG;
+        delete waitingGare;
 
     }
     /**
@@ -71,7 +79,8 @@ public:
         afficher_message(qPrintable(QString("ENTREE ACESS: %1 .").arg(loco.numero())));
 
         mutexA->acquire();
-        if (!section_busy){//si c'est libre
+        if (!section_busy && loco.priority){//si c'est libre et que l'on a le droit
+                                            //d'accéder on rentre
             section_busy = true;
             mutexA->release();
         }
@@ -79,14 +88,13 @@ public:
             loco.arreter();
             in_queue = true;
             afficher_message(qPrintable(QString("AVANT BLOQUE  %1 .").arg(loco.numero())));
-
-            waiting->acquire();
-
             mutexA->release();
+
+            waitingSecCritique->acquire();
+            //attente de 5 à 10" avant redémarrage => ne pas faire vomir les passagers
+            PcoThread::usleep((rand() % 10 + 5) * 100000);
             loco.demarrer();
         }
-
-        // Exemple de message dans la console globale
     }
 
     /**
@@ -98,19 +106,14 @@ public:
      */
     void leave(Locomotive& loco) override {
         // TODO
-
         mutexL->acquire();
-
         section_busy = false;
-
         if (in_queue){ //Si une loco attend
 
-            waiting->release();
+            waitingSecCritique->release();
             in_queue = false;
-
         }
         afficher_message(qPrintable(QString("SORTIE ACESS: %1 .").arg(loco.numero())));
-
         mutexL->release();
     }
 
@@ -124,17 +127,32 @@ public:
      */
     void stopAtStation(Locomotive& loco) override {
         // TODO
+        if (!locoIsWaitingInStation){
+            //si on est la première loco à arriver en gare => on attend
+            mutexG->acquire();
+            locoIsWaitingInStation = true;
+            mutexG->release();
 
-        // contact 29 pour loco0 et 33 pour loco1
+            loco.arreter();
 
-        while (loco.numero()){
+            waitingGare->acquire();
 
+            mutexG->acquire();
+            locoIsWaitingInStation = false;
+            mutexG->release();
 
+            loco.priority = 0;
+            loco.demarrer();
+        }else{
+            //lorsque la deuxième arrive => débloquer l'autre après 5"
+            loco.arreter();
+            PcoThread::usleep(5000000);
+            loco.demarrer();
+            waitingGare->release();
+            loco.priority = 1;
 
+            //mettre la priorité à 1 (prioritaire) à la deuxième loco
         }
-
-
-
 
         // Exemple de message dans la console globale
         afficher_message(qPrintable(QString("The engine no. %1 arrives at the station.").arg(loco.numero())));
