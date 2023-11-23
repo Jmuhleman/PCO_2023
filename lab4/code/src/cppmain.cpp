@@ -105,11 +105,13 @@ int cmain()
 
     // Création de la section partagée
     std::shared_ptr<SynchroInterface> sharedSection = std::make_shared<Synchro>();
+    std::vector<int> parcoursA = {30, 28, 16, 15};
+    std::vector<int> parcoursB = {34, 32, 16, 15};
 
     // Création du thread pour la loco 0
-    locoBehaveA = std::make_unique<LocomotiveBehavior>(locoA, sharedSection /*, autres paramètres ...*/);
+    locoBehaveA = std::make_unique<LocomotiveBehavior>(locoA, sharedSection, parcoursA);
     // Création du thread pour la loco 1
-    locoBehaveB = std::make_unique<LocomotiveBehavior>(locoB, sharedSection /*, autres paramètres ...*/);
+    locoBehaveB = std::make_unique<LocomotiveBehavior>(locoB, sharedSection, parcoursB);
 
     // Lanchement des threads
     afficher_message(qPrintable(QString("Lancement thread loco A (numéro %1)").arg(locoA.numero())));

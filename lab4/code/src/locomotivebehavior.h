@@ -24,13 +24,13 @@ public:
      * \brief locomotiveBehavior Constructeur de la classe
      * \param loco la locomotive dont on représente le comportement
      */
-    LocomotiveBehavior(Locomotive& loco, std::shared_ptr<SynchroInterface> sharedSection /*, autres paramètres éventuels */) : loco(loco), sharedSection(sharedSection) {
+    LocomotiveBehavior(Locomotive& loco, std::shared_ptr<SynchroInterface> sharedSection, std::vector<int> parcours) : loco(loco), sharedSection(sharedSection) {
         // Eventuel code supplémentaire du constructeur
-        priority = 1;
+        // ajouté ici pour bien le voir..
+        this->parcours = parcours;
     }
-
     void stopRequest();
-    int priority;
+
 
 protected:
     /*!
@@ -58,11 +58,13 @@ protected:
      */
     std::shared_ptr<SynchroInterface> sharedSection;
 
+    std::vector<int> parcours;
+
     /*
      * Vous êtes libres d'ajouter des méthodes ou attributs
      *
      * Par exemple la priorité ou le parcours
-     */
+     */  
 };
 
 #endif // LOCOMOTIVEBEHAVIOR_H

@@ -22,31 +22,28 @@ void LocomotiveBehavior::run()
     //sharedSection->access(loco);
     //sharedSection->leave(loco);
     //sharedSection->stopAtStation(loco);
-    bool devie = true;
-    int locoActuel = loco.numero();
 
-
+    //priorité pour la sortie de gare
     loco.priority = 1;
-
-        while (locoActuel == 1){ //loco bleue
+    while(true){
             if (PcoThread::thisThread()->stopRequested()){
                 loco.arreter();
                 return;
             }
-            attendre_contact(34);
+            attendre_contact(parcours.at(0));
             sharedSection->stopAtStation(loco);
 
-            attendre_contact(32);
+            attendre_contact(parcours.at(1));
             sharedSection->access(loco);
 
-            attendre_contact(16);
-            diriger_aiguillage(8, !devie, 0);
+            attendre_contact(parcours.at(2));
+            //puisque le numéro de la loco correspond à sa direction hehe
+            diriger_aiguillage(8, !loco.numero(), 0);
 
-            attendre_contact(15);
+            attendre_contact(parcours.at(3));
             sharedSection->leave(loco);
-
-        }
-        while (locoActuel == 0) {
+    }
+        /* loco 0
             if (PcoThread::thisThread()->stopRequested()){
                 loco.arreter();
                 return;
@@ -59,13 +56,13 @@ void LocomotiveBehavior::run()
 
 
             attendre_contact(16);
-            diriger_aiguillage(8, devie, 0);
+            diriger_aiguillage(8, 1, 0);
 
             attendre_contact(15);
             sharedSection->leave(loco);
+*/
 
 
-        }
 }
 
 void LocomotiveBehavior::stopRequest(){

@@ -92,7 +92,7 @@ public:
 
             waitingSecCritique->acquire();
             //attente de 5 à 10" avant redémarrage => ne pas faire vomir les passagers
-            PcoThread::usleep((rand() % 10 + 5) * 100000);
+            PcoThread::usleep((rand() % 5 + 2) * 100000);
             loco.demarrer();
         }
     }
