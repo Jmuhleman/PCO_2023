@@ -23,6 +23,12 @@ void LocomotiveBehavior::run()
     //sharedSection->leave(loco);
     //sharedSection->stopAtStation(loco);
 
+    //Malheureusement pas possibilité de manipuler des parcours de plus de 4 contacts.
+    //lorsque la vitesse entraine une distance de freinage trop grande (le train s'arrête après le prochain contact attendu
+    //dans le cycle) la gestion n'est plus conhérente.
+    //Lorsque un train roule avec une vitesse très inférieure à l'autre, puisque le point d'arrêt dépend directement de la
+    //vitesse ce celui-ci, les trains de sont plus tellement "en gare l'un à côté de l'autre"
+
     //priorité pour la sortie de gare
     loco.priority = 1;
     while(true){
