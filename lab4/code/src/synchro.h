@@ -33,7 +33,6 @@ private:
     // Attribut privés ...
     PcoSemaphore *waitingSecCritique;
     PcoSemaphore *mutexA;
-    PcoSemaphore *mutexL;
     PcoSemaphore *waitingGare;
     PcoSemaphore *mutexG;
     bool section_busy;
@@ -52,7 +51,6 @@ public:
         waitingGare = new PcoSemaphore{0}; //pour attente en gare
         mutexG = new PcoSemaphore{1}; // protection des données dans stopAtStation
         mutexA = new PcoSemaphore {1}; //protection des données dans access
-        mutexL = new PcoSemaphore {1}; //protection des données dans leave
         locoIsWaitingInStation = false;
         section_busy = false;
         in_queue = false;
@@ -62,10 +60,8 @@ public:
     ~Synchro(){
         delete waitingSecCritique;
         delete mutexA;
-        delete mutexL;
         delete mutexG;
         delete waitingGare;
-
     }
     /**
      * @brief access Méthode à appeler pour accéder à la section partagée
@@ -103,13 +99,13 @@ public:
      */
     void leave(Locomotive& loco) override {
         // TODO
-        mutexL->acquire();
+        mutexA->acquire();
         section_busy = false;
         if (in_queue){ //Si une loco attend on la laisse entrer
             waitingSecCritique->release();
             in_queue = false;
         }
-        mutexL->release();
+        mutexA->release();
     }
 
     /**
