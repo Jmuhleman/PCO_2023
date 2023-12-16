@@ -173,6 +173,7 @@ protected:
     bool workingChairBusy = false;
     bool hasSitOnChair = false;
     bool hasFinishedHaircut = false;
+    bool hasGoneHome = false;
 
     int capacity;
     bool requestCloseService = false;

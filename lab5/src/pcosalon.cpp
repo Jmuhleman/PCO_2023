@@ -68,16 +68,19 @@ void PcoSalon::goForHairCut(unsigned clientId)
     condition.notifyAll();
 
 
-    _interface->consoleAppendTextClient(clientId, "attente coupe de chveu finit");
     --nbClientsWaiting;
     barberIsWorking = true;
     workingChairBusy = true;
 
     while (!hasFinishedHaircut)
     {
+        _interface->consoleAppendTextClient(clientId, "attente coupe de chveu finit");
+
         condition.wait(&_mutex);
     }
     hasFinishedHaircut = false;
+    _interface->consoleAppendTextClient(clientId, "attente coupe de chveu terminé!!!!");
+
 
     _mutex.unlock();
 
@@ -107,9 +110,12 @@ void PcoSalon::walkAround(unsigned clientId)
 void PcoSalon::goHome(unsigned clientId){
     // TODO
     _mutex.lock();
-    animationClientGoHome(clientId);
     workingChairBusy = false;
     barberIsWorking = false;
+    animationClientGoHome(clientId);
+    hasGoneHome = true;
+    condition.notifyAll();
+
     _mutex.unlock();
 }
 
@@ -150,10 +156,11 @@ void PcoSalon::waitClientAtChair()
     _mutex.lock();
     while (!hasSitOnChair){
         _interface->consoleAppendTextBarber("attente du client");
-
         condition.wait(&_mutex);
     }
     hasSitOnChair = false;
+    _interface->consoleAppendTextBarber("fin attente client");
+
     _mutex.unlock();
     // TODO
 }
@@ -164,6 +171,12 @@ void PcoSalon::beautifyClient()
     _mutex.lock();
     animationBarberCuttingHair();
     hasFinishedHaircut = true;
+    condition.notifyAll();
+
+    while (!hasGoneHome){
+        condition.wait(&_mutex);
+    }
+    hasGoneHome = false;
     // TODO
     _mutex.unlock();
 }
