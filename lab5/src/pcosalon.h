@@ -168,7 +168,7 @@ protected:
     PcoMutex _mutex;
     PcoConditionVariable condition;
 
-    int nbClientsWaiting;
+    int ncClientInSalon;
     bool barberIsWorking = false;
     bool workingChairBusy = false;
     bool hasSitOnChair = false;
@@ -176,8 +176,6 @@ protected:
     bool hasGoneHome = false;
     //Ajouter une define
     bool waitingChairsBusy[2] = {false, false};
-    //variable pour ne pas passer devant le client qui est arrivé avant
-    bool customerSelected = false;
 
     int capacity;
     bool requestCloseService = false;
