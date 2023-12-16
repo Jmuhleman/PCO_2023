@@ -1,4 +1,0 @@
-/home/jul/pco/pco23_lab05/code/cmake-build-debug/CMakeFiles/pco_barbier.dir
-/home/jul/pco/pco23_lab05/code/cmake-build-debug/CMakeFiles/edit_cache.dir
-/home/jul/pco/pco23_lab05/code/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/jul/pco/pco23_lab05/code/cmake-build-debug/CMakeFiles/pco_barbier_autogen.dir
