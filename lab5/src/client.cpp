@@ -28,7 +28,6 @@ void Client::run()
 
         if (!_salon->isInService()){
             _salon->walkAround(_clientId);
-            _interface->consoleAppendTextClient(_clientId, "Je vais faire un tour !");
 
         }else{
 
@@ -36,12 +35,12 @@ void Client::run()
             if (!_salon->accessSalon(_clientId)){
                 //si le salon est plein
                 _salon->walkAround(_clientId);
-                _interface->consoleAppendTextClient(_clientId, "Je vais faire un tour !");
 
             }else{
                 //si on a de la place
                 _salon->goForHairCut(_clientId);
                 _salon->goHome(_clientId);
+                _salon->waitingForHairToGrow(_clientId);
             }
         }
 

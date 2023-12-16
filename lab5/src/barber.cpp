@@ -24,7 +24,6 @@ void Barber::run()
     while(true){
 
         if (_salon->getNbClient() > 0){
-            _interface->consoleAppendTextBarber("traitere qqun");
 
             _salon->pickNextClient();
             _salon->waitClientAtChair();
@@ -32,10 +31,7 @@ void Barber::run()
 
         }else{
             //aller dormir
-            _interface->consoleAppendTextBarber("dormir");
             _salon->goToSleep();
-            _interface->consoleAppendTextBarber("revenir");
-
         }
 
 

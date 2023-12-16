@@ -174,6 +174,10 @@ protected:
     bool hasSitOnChair = false;
     bool hasFinishedHaircut = false;
     bool hasGoneHome = false;
+    //Ajouter une define
+    bool waitingChairsBusy[2] = {false, false};
+    //variable pour ne pas passer devant le client qui est arrivé avant
+    bool customerSelected = false;
 
     int capacity;
     bool requestCloseService = false;
