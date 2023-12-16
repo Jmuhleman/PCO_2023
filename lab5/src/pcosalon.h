@@ -176,9 +176,9 @@ protected:
     bool hasSitOnChair = false;
     bool hasFinishedHaircut = false;
     bool hasGoneHome = false;
-    int noCustomer = 0;
     //Ajouter une define
     bool waitingChairsBusy[2] = {false, false};
+    std::vector<int> listCustomers = {};
     int capacity;
     bool requestCloseService = false;
     bool canCloseServiceProperly = false;
