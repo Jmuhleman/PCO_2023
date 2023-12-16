@@ -34,8 +34,5 @@ void Barber::run()
             _salon->goToSleep();
         }
 
-
     }
-
-    _interface->consoleAppendTextBarber("La journée est terminée, à demain !");
 }

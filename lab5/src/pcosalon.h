@@ -168,8 +168,10 @@ protected:
     PcoMutex _mutex;
     PcoConditionVariable condition;
 
-    int ncClientInSalon;
-    bool barberIsWorking = false;
+    int nbClientInSalon;
+    //barberIsWorking != le barbier dort
+    //si il n'a pas de travail alors un client peut venir mais il ne va pas forcément dormir
+    bool barberIsSleeping = true;
     bool workingChairBusy = false;
     bool hasSitOnChair = false;
     bool hasFinishedHaircut = false;
