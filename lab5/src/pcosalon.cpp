@@ -26,8 +26,7 @@ PcoSalon::PcoSalon(GraphicSalonInterface *interface, unsigned int capacity)
 bool PcoSalon::accessSalon(unsigned clientId)
 {
     _mutex.lock();
-
-    if (nbClientInSalon + 1 < capacity+1){
+    if (nbClientInSalon + 1 <= capacity+1){
         ++nbClientInSalon;
         animationClientAccessEntrance(clientId);
         _mutex.unlock();
@@ -43,16 +42,18 @@ void PcoSalon::goForHairCut(unsigned clientId)
 {
     _mutex.lock();
     _interface->consoleAppendTextClient(clientId, "je peux rentrer");
+    int noWaitingChair = 0;
 
     while (workingChairBusy){
         _interface->consoleAppendTextClient(clientId, "je dois aller attendre sur une chaise");
-        //si le barber est en train de travailler
+        //si ls chaise est occupée
         //si on arrive la c'est que la capacité du salon le permet
-        //trouver une chaise libre
-        int noWaitingChair = 0;
+
         if (nbClientInSalon > 0){
 
-            for ( ; noWaitingChair  < 2 ; ++noWaitingChair ){
+            //si ya des clients on leur passe pas devant...
+            //trouver une chaise libre
+            for ( ; noWaitingChair  < 2 ; ++noWaitingChair){
                 if (waitingChairsBusy[noWaitingChair] == false){
                     //s'asseoir dessus
                     waitingChairsBusy[noWaitingChair ] = true;
@@ -63,17 +64,18 @@ void PcoSalon::goForHairCut(unsigned clientId)
         }
         //et attendre son tour
         condition.wait(&_mutex);
-        //libérer sa chaise et se lever vers le barbier
+        //laisser ça ici pour que les arrivant puissent trouver une chaise libre
         waitingChairsBusy[noWaitingChair] = false;
 
     }
-
+    //libérer sa chaise et se lever vers le barbier
     workingChairBusy = true;
     if (barberIsSleeping){
+        //si le barbier dort on le réveille
+        barberIsSleeping = false;
         animationWakeUpBarber();
+        condition.notifyAll();
     }
-    condition.notifyAll();
-
 
     animationClientSitOnWorkChair(clientId);
     hasSitOnChair = true;
@@ -88,9 +90,7 @@ void PcoSalon::goForHairCut(unsigned clientId)
     hasFinishedHaircut = false;
     _interface->consoleAppendTextClient(clientId, "attente coupe de chveu terminé!!!!");
 
-
     _mutex.unlock();
-
     // TODO
 
 }
@@ -209,10 +209,8 @@ bool PcoSalon::isInService()
 
 void PcoSalon::endService()
 {
-    _mutex.lock();
     requestCloseService = true;
-    // TODO
-    _mutex.unlock();
+    // TOD
 }
 
 /********************************************

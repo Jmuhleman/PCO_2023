@@ -23,6 +23,7 @@ void Barber::run()
     // TODO
     while(true){
 
+
         if (_salon->getNbClient() > 0){
 
             _salon->pickNextClient();
