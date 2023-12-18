@@ -24,25 +24,20 @@ Client::Client(GraphicSalonInterface *interface, std::shared_ptr<SalonClientInte
 void Client::run()
 {
     // TODO
-    while(true){
+    while(_salon->isInService()){
+        //placer les init dans le constructeur!!!!!!!!!!!
 
-        if (!_salon->isInService()){
+        if (_salon->accessSalon(_clientId) == false){
+            //si le salon est plein
             _salon->walkAround(_clientId);
 
         }else{
-
-            //Si le salon est ouvert
-            if (!_salon->accessSalon(_clientId)){
-                //si le salon est plein
-                _salon->walkAround(_clientId);
-
-            }else{
-                //si on a de la place
-                _salon->goForHairCut(_clientId);
-                _salon->goHome(_clientId);
-                _salon->waitingForHairToGrow(_clientId);
-            }
+            //si on a de la place
+            _salon->goForHairCut(_clientId);
+            _salon->goHome(_clientId);
+            _salon->waitingForHairToGrow(_clientId);
         }
+
 
     }
 
