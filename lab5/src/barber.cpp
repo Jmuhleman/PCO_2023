@@ -22,9 +22,9 @@ void Barber::run()
 {
     // TODO
     while(true){
-    //implémenter la terminaison
+
         if (_salon->getNbClient() > 0){
-            //si ya des clients au boulot !
+            //si ya des clients, au boulot !
             _salon->pickNextClient();
             _salon->waitClientAtChair();
             _salon->beautifyClient();
@@ -33,9 +33,8 @@ void Barber::run()
             //aller dormir
             _salon->goToSleep();
         }else{
-            _salon->goToSleep();
+            //si c'est la fin de la journée
             break;
         }
-
     }
 }

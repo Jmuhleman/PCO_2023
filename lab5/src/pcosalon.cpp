@@ -16,8 +16,15 @@
 
 PcoSalon::PcoSalon(GraphicSalonInterface *interface, unsigned int capacity)
     : _interface(interface), capacity(capacity),
-      nbClientInSalon(0)
+      nbClientInSalon(0),
+      barberIsSleeping(true),
+      workingChairBusy(false),
+      requestCloseService(false)
 {
+    for (auto w : waitingChairsBusy){
+        w = false;
+    }
+    listCustomersInQueue = {};
     // TODO
 }
 
@@ -28,9 +35,9 @@ bool PcoSalon::accessSalon(unsigned clientId)
 {
     _mutex.lock();
     if (nbClientInSalon + 1 <= capacity + 1){
-        ++nbClientInSalon;
+        ++nbClientInSalon;                      
 
-        listCustomers.push_back(clientId);
+        listCustomersInQueue.push_back(clientId);
         animationClientAccessEntrance(clientId);
 
         _mutex.unlock();
@@ -46,39 +53,44 @@ void PcoSalon::goForHairCut(unsigned clientId)
 {
     _mutex.lock();
     int noWaitingChair = 0;
+    while (workingChairBusy || listCustomersInQueue.at(0) != clientId){
+    //Si on est PAS le prochain sur la liste ou que la place est occupée
+    //alors on attend son tour
+    //_interface->consoleAppendTextClient(clientId, "je vais attendre");
 
-    while (workingChairBusy || listCustomers.at(0) != clientId){
-
-        _interface->consoleAppendTextClient(clientId, "je vais attendre");
-
-        for (; noWaitingChair < 2 ; ++noWaitingChair){
+        for (; noWaitingChair < NB_SIEGES ; ++noWaitingChair){
+        //on cherche une chaise libre pour attendre
             if (waitingChairsBusy[noWaitingChair] == false){
-
                 waitingChairsBusy[noWaitingChair] = true;
                 animationClientSitOnChair(clientId, noWaitingChair);
                 break;
             }
         }
         conditionClient.wait(&_mutex);
+        //Si on se lève, on libère la chaise.
         waitingChairsBusy[noWaitingChair] = false;
     }
-
-    listCustomers.erase(listCustomers.begin());
-    _interface->consoleAppendTextClient(clientId, "je vais sur la chaise ");
+    //_interface->consoleAppendTextClient(clientId, "je vais sur la chaise ");
+    //Si c'est notre tour alors on occupe la chaise de travail
+    //et on se retire de la file d'attente.
     workingChairBusy = true;
+    listCustomersInQueue.erase(listCustomersInQueue.begin());
 
+    //Si le barber dort, on le réveille
     if (barberIsSleeping){
-        //si le barbier dort on le réveille
         animationWakeUpBarber();
-        conditionBarbder.notifyOne();////////////////////////////////////////
+        conditionBarbder.notifyOne();
     }
-
     animationClientSitOnWorkChair(clientId);
-    conditionBarbder.notifyOne();/////////////////////
+
+    //Dire au barbier qu'on est sur la chaise...
+    //et prêt à avoir le crâne taillé...
+    conditionBarbder.notifyOne();
+
+    //On attend que le barbier ait fini son travail
     conditionClient.wait(&_mutex);
     _mutex.unlock();
     // TODO
-
 }
 
 void PcoSalon::waitingForHairToGrow(unsigned clientId)
@@ -102,12 +114,12 @@ void PcoSalon::walkAround(unsigned clientId)
 void PcoSalon::goHome(unsigned clientId){
     // TODO
     _mutex.lock();
-
     animationClientGoHome(clientId);
+    //Si on quitte le salon on met à jour le nombre de clients dans le salon
     --nbClientInSalon;
+    //Avertir le barbier qu'on est parti
     conditionBarbder.notifyOne();////////////////////////////////////
-    _interface->consoleAppendTextClient(clientId, "je rentre à la maison");
-
+    //_interface->consoleAppendTextClient(clientId, "je rentre à la maison");
     _mutex.unlock();
 }
 
@@ -124,11 +136,12 @@ unsigned int PcoSalon::getNbClient()
 void PcoSalon::goToSleep()
 {
     _mutex.lock();
+    //Le barbier part dormir et attend un client
     barberIsSleeping = true;
     animationBarberGoToSleep();
     conditionBarbder.wait(&_mutex);
+    //Le barbier se fait réveiller mettre à jour son état
     barberIsSleeping = false;
-
     _mutex.unlock();
     // TODO
 }
@@ -137,9 +150,9 @@ void PcoSalon::goToSleep()
 void PcoSalon::pickNextClient()
 {
     _mutex.lock();
-    _interface->consoleAppendTextBarber("je prend le prochain client");
-    conditionClient.notifyAll();/////////////le prochain prioritaire///////////////
-    // TODO
+    //_interface->consoleAppendTextBarber("je prend le prochain client");
+    //Inviter le prochain client prioritaire
+    conditionClient.notifyAll();
     _mutex.unlock();
 }
 
@@ -147,9 +160,8 @@ void PcoSalon::pickNextClient()
 void PcoSalon::waitClientAtChair()
 {
     _mutex.lock();
-    _interface->consoleAppendTextBarber("attente du client à la chaise");
+    //_interface->consoleAppendTextBarber("attente du client à la chaise");
     conditionBarbder.wait(&_mutex);
-
     _mutex.unlock();
     // TODO
 }
@@ -158,11 +170,13 @@ void PcoSalon::waitClientAtChair()
 void PcoSalon::beautifyClient()
 {
     _mutex.lock();
-    _interface->consoleAppendTextBarber("start coupe de cheveu");
+    //_interface->consoleAppendTextBarber("start coupe de cheveu");
     animationBarberCuttingHair();
-    conditionClient.notifyAll();///////////////////////////////////
+    //Avertir le client que le travail est fini
+    conditionClient.notifyAll();
+    //Attendre que le client quitte le salon
     conditionBarbder.wait(&_mutex);
-    _interface->consoleAppendTextBarber("chaise libre");
+    //_interface->consoleAppendTextBarber("chaise libre");
     workingChairBusy = false;
     // TODO
     _mutex.unlock();
@@ -183,7 +197,7 @@ void PcoSalon::endService()
     _mutex.lock();
     requestCloseService = true;
     _mutex.unlock();
-    _interface->consoleAppendTextBarber("FIN DU SERVICE DEMANDEE");
+    //_interface->consoleAppendTextBarber("FIN DU SERVICE DEMANDEE");
     // TOD
 }
 

@@ -164,19 +164,21 @@ protected:
     void animationClientGoHome(unsigned clientId);
 
 protected:
+    constexpr static unsigned int NB_SIEGES = 2;
+
     GraphicSalonInterface *_interface;
+    int capacity;
     PcoMutex _mutex;
+
     PcoConditionVariable conditionClient;
     PcoConditionVariable conditionBarbder;
+
     int nbClientInSalon; 
-    bool barberIsSleeping = true;
-    bool workingChairBusy = false;
-    //Ajouter une define
-    bool waitingChairsBusy[2] = {false, false};
-    std::vector<int> listCustomers = {};
-    int capacity;
-    bool requestCloseService = false;
-    bool canCloseServiceProperly = false;
+    bool barberIsSleeping;
+    bool workingChairBusy;
+    bool waitingChairsBusy[NB_SIEGES];
+    std::vector<int> listCustomersInQueue;
+    bool requestCloseService;
     // TODO
 };
 
