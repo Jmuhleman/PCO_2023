@@ -34,12 +34,12 @@ PcoSalon::PcoSalon(GraphicSalonInterface *interface, unsigned int capacity)
 bool PcoSalon::accessSalon(unsigned clientId)
 {
     _mutex.lock();
+    //Le client essaie d'entrer
     if (nbClientInSalon + 1 <= capacity + 1){
         ++nbClientInSalon;                      
-
+        //si le client entre, on le met dans la queue
         listCustomersInQueue.push_back(clientId);
         animationClientAccessEntrance(clientId);
-
         _mutex.unlock();
         return true;
     }

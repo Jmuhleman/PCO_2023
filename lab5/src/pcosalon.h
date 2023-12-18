@@ -173,12 +173,12 @@ protected:
     PcoConditionVariable conditionClient;
     PcoConditionVariable conditionBarbder;
 
-    int nbClientInSalon; 
-    bool barberIsSleeping;
-    bool workingChairBusy;
-    bool waitingChairsBusy[NB_SIEGES];
-    std::vector<int> listCustomersInQueue;
-    bool requestCloseService;
+    int nbClientInSalon; //nombre de clients total dans le salon
+    bool barberIsSleeping;//pour que le client sache si le barber dort
+    bool workingChairBusy;//pour savoir si le barber está trabajando
+    bool waitingChairsBusy[NB_SIEGES];//indique l'occupation de chaque siège d'attente
+    std::vector<int> listCustomersInQueue;//liste des clients en attente ordonné par priorité
+    bool requestCloseService;//demande de fermeture du salon
     // TODO
 };
 

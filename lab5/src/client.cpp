@@ -25,7 +25,6 @@ void Client::run()
 {
     // TODO
     while(_salon->isInService()){
-        //placer les init dans le constructeur!!!!!!!!!!!
 
         if (_salon->accessSalon(_clientId) == false){
             //si le salon est plein
@@ -37,8 +36,5 @@ void Client::run()
             _salon->goHome(_clientId);
             _salon->waitingForHairToGrow(_clientId);
         }
-
-
     }
-
 }
