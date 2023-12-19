@@ -78,7 +78,6 @@ void PcoSalon::goForHairCut(unsigned clientId)
 
     //Si le barber dort, on le réveille
     if (barberIsSleeping){
-        animationWakeUpBarber();
         conditionBarbder.notifyOne();
     }
     animationClientSitOnWorkChair(clientId);
@@ -142,6 +141,8 @@ void PcoSalon::goToSleep()
     conditionBarbder.wait(&_mutex);
     //Le barbier se fait réveiller mettre à jour son état
     barberIsSleeping = false;
+    animationWakeUpBarber();
+
     _mutex.unlock();
     // TODO
 }
@@ -196,6 +197,8 @@ void PcoSalon::endService()
 {
     _mutex.lock();
     requestCloseService = true;
+    if (barberIsSleeping)
+        conditionBarbder.notifyOne();
     _mutex.unlock();
     //_interface->consoleAppendTextBarber("FIN DU SERVICE DEMANDEE");
     // TOD

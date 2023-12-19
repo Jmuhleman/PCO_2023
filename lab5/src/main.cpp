@@ -15,14 +15,14 @@
 #include "application.h"
 #include "utils/graphicsaloninterface.h"
 
-constexpr unsigned int NB_CLIENTS = 10;
+constexpr unsigned int NB_CLIENTS = 2;
 constexpr unsigned int NB_SIEGES = 2;
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
-    logger().setVerbosity(1);
+    logger().setVerbosity(2);
 
     // Initialisation de la partie graphique de l'application
     GraphicSalonInterface::initialize(NB_CLIENTS, NB_SIEGES);
