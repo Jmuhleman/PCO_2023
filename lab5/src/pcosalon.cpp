@@ -16,7 +16,8 @@
 PcoSalon::PcoSalon(GraphicSalonInterface *interface, unsigned int capacity)
 	: _interface(interface), capacity(capacity),
 	  requestCloseService(false),
-	  waitingChairIndex(0) {
+	  waitingChairIndex(0),
+	  hasSit(false) {
 }
 
 /********************************************
@@ -30,13 +31,16 @@ bool PcoSalon::accessSalon(unsigned clientId) {
 		_interface->consoleAppendTextClient(clientId, "je peux pas entrer");
 		return false;
 	}
+	//on se met dans la file
 	customerQueue.push(clientId);
 	animationClientAccessEntrance(clientId);
+	//on réveille le barber
 	conditionBarber.notifyOne();
-
+	//si on est pas le premier -> on va sur une chaise
 	if (customerQueue.front() != clientId) {
 		_interface->consoleAppendTextClient(clientId, "je vais attendre");
 		animationClientSitOnChair(clientId, waitingChairIndex++);
+		//pour ne pas incrémenter indéfiniment
 		if (waitingChairIndex >= capacity)
 			waitingChairIndex = 0;
 	}
@@ -47,6 +51,7 @@ bool PcoSalon::accessSalon(unsigned clientId) {
 
 void PcoSalon::goForHairCut(unsigned clientId) {
 	_mutex.lock();
+	//si on est pas le prochain sur la liste
 	while (customerQueue.front() != clientId) {
 		condWaitingChair.wait(&_mutex);
 	}
@@ -55,6 +60,7 @@ void PcoSalon::goForHairCut(unsigned clientId) {
 	//_interface->consoleAppendTextClient(clientId, "je vais sur la chaise ");
 	animationClientSitOnWorkChair(clientId);
 	//Dire au barbier qu'on est sur la chaise...
+	hasSit = true;
 	condHasSit.notifyOne();
 	//On attend que le barbier ait fini son travail
 	conditionClient.wait(&_mutex);
@@ -98,7 +104,7 @@ void PcoSalon::goToSleep() {
 	//Le barbier part dormir et attend un client
 	animationBarberGoToSleep();
 	conditionBarber.wait(&_mutex);
-	//Le barbier se fait réveiller mettre à jour son état
+	//Le barbier se fait réveiller -> mettre à jour son état
 	animationWakeUpBarber();
 	_mutex.unlock();
 }
@@ -115,22 +121,27 @@ void PcoSalon::pickNextClient() {
 
 void PcoSalon::waitClientAtChair() {
 	_mutex.lock();
-	//_interface->consoleAppendTextBarber("attente du client à la chaise");
-	condHasSit.wait(&_mutex);
+	_interface->consoleAppendTextBarber("attente du client à la chaise");
+	//permet la synchronisation entre les cycles barber et client sinon on a des
+	// décalages sur le scénario
+	while (hasSit == 0) {
+		condHasSit.wait(&_mutex);
+	}
+	hasSit = false;
 	_mutex.unlock();
 }
 
 
 void PcoSalon::beautifyClient() {
 	_mutex.lock();
-	//_interface->consoleAppendTextBarber("start coupe de cheveu");
+	_interface->consoleAppendTextBarber("start coupe de cheveu");
 	animationBarberCuttingHair();
-
+	//dire au client que c'est fini (passer le miroir derrière sa tête... ;-)
 	conditionClient.notifyOne();
+	//le client part -> le retirer de la file
 	customerQueue.pop();
-
 	_mutex.unlock();
-	//_interface->consoleAppendTextBarber("fin coupe de cheveu");
+	_interface->consoleAppendTextBarber("fin coupe de cheveu");
 
 }
 
@@ -148,6 +159,7 @@ bool PcoSalon::isInService() {
 void PcoSalon::endService() {
 	_mutex.lock();
 	requestCloseService = true;
+	//Si le barber dort -> le réveiller pour ranger le salon
 	conditionBarber.notifyOne();
 	_mutex.unlock();
 	_interface->consoleAppendTextBarber("FIN DU SERVICE DEMANDEE");

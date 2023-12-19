@@ -174,6 +174,7 @@ protected:
 	unsigned waitingChairIndex; //index du siège d'attente libre
 	std::queue<unsigned> customerQueue;//liste des clients ordonnés par priorité le client traité est toujours dans la queue
 	bool requestCloseService; //demande de fermeture du salon
+	bool hasSit;
 };
 
 #endif // PCOSALON_H
