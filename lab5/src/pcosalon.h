@@ -167,7 +167,7 @@ protected:
 	GraphicSalonInterface *_interface;
 	unsigned int capacity;
 	PcoMutex _mutex;
-
+	PcoConditionVariable condHasSit;
 	PcoConditionVariable conditionClient;
 	PcoConditionVariable conditionBarber;
 	PcoConditionVariable condWaitingChair;
