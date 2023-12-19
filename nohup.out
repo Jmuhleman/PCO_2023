@@ -1,0 +1,25 @@
+QStandardPaths: wrong permissions on runtime directory /run/user/1000/, 0755 instead of 0700
+
+(tilix:5831): GLib-GObject-WARNING **: 13:49:53.986: invalid (NULL) pointer instance
+
+(tilix:5831): GLib-GObject-CRITICAL **: 13:49:53.986: g_signal_handlers_disconnect_matched: assertion 'G_TYPE_CHECK_INSTANCE (instance)' failed
+
+(tilix:5911): GLib-GObject-WARNING **: 13:50:40.828: invalid (NULL) pointer instance
+
+(tilix:5911): GLib-GObject-CRITICAL **: 13:50:40.828: g_signal_handlers_disconnect_matched: assertion 'G_TYPE_CHECK_INSTANCE (instance)' failed
+
+(tilix:5990): GLib-GObject-WARNING **: 13:50:50.861: invalid (NULL) pointer instance
+
+(tilix:5990): GLib-GObject-CRITICAL **: 13:50:50.861: g_signal_handlers_disconnect_matched: assertion 'G_TYPE_CHECK_INSTANCE (instance)' failed
+
+(tilix:6072): GLib-GObject-WARNING **: 13:51:22.505: invalid (NULL) pointer instance
+
+(tilix:6072): GLib-GObject-CRITICAL **: 13:51:22.505: g_signal_handlers_disconnect_matched: assertion 'G_TYPE_CHECK_INSTANCE (instance)' failed
+
+(tilix:6153): GLib-GObject-WARNING **: 13:51:55.205: invalid (NULL) pointer instance
+
+(tilix:6153): GLib-GObject-CRITICAL **: 13:51:55.205: g_signal_handlers_disconnect_matched: assertion 'G_TYPE_CHECK_INSTANCE (instance)' failed
+
+(tilix:6230): GLib-GObject-WARNING **: 13:52:06.899: invalid (NULL) pointer instance
+
+(tilix:6230): GLib-GObject-CRITICAL **: 13:52:06.899: g_signal_handlers_disconnect_matched: assertion 'G_TYPE_CHECK_INSTANCE (instance)' failed

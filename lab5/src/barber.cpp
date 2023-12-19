@@ -12,29 +12,28 @@
 
 #include <iostream>
 
-Barber::Barber(GraphicSalonInterface *interface, std::shared_ptr<SalonBarberInterface> salon)
-    : _interface(interface), _salon(salon)
-{
-    _interface->consoleAppendTextBarber("Salut, prêt à travailler !" + QString(_salon->getNbClient()));
+Barber::Barber(GraphicSalonInterface *interface,
+					std::shared_ptr<SalonBarberInterface> salon)
+	: _interface(interface), _salon(salon) {
+	_interface->consoleAppendTextBarber(
+		"Salut, prêt à travailler !" + QString(_salon->getNbClient()));
 }
 
-void Barber::run()
-{
-    // TODO
-    while(true){
+void Barber::run() {
+	while (true) {
 
-        if (_salon->getNbClient() > 0){
-            //si ya des clients, au boulot !
-            _salon->pickNextClient();
-            _salon->waitClientAtChair();
-            _salon->beautifyClient();
+		if (_salon->getNbClient() > 0) {
+			//si ya des clients, au boulot !
+			_salon->pickNextClient();
+			_salon->waitClientAtChair();
+			_salon->beautifyClient();
 
-        }else if (_salon->isInService()){
-            //aller dormir
-            _salon->goToSleep();
-        }else{
-            //si c'est la fin de la journée
-            break;
-        }
-    }
+		} else if (_salon->isInService()) {
+			//aller dormir
+			_salon->goToSleep();
+		} else {
+			//si c'est la fin de la journée
+			break;
+		}
+	}
 }
