@@ -57,12 +57,8 @@ void PcoSalon::goForHairCut(unsigned clientId) {
 	//Dire au barbier qu'on est sur la chaise...
 	//et prêt à avoir le crâne taillé...
 	conditionBarber.notifyOne();
-
 	//On attend que le barbier ait fini son travail
 	conditionClient.wait(&_mutex);
-	conditionBarber.notifyOne();
-	customerQueue.pop();
-
 	_mutex.unlock();
 }
 
@@ -128,14 +124,15 @@ void PcoSalon::waitClientAtChair() {
 
 void PcoSalon::beautifyClient() {
 	_mutex.lock();
-	_interface->consoleAppendTextBarber("start coupe de cheveu");
+	//_interface->consoleAppendTextBarber("start coupe de cheveu");
 	animationBarberCuttingHair();
-	//Avertir le client que le travail est fini
+
 	conditionClient.notifyOne();
-	//Attendre que le client quitte le salon
-	conditionBarber.wait(&_mutex);
-	//_interface->consoleAppendTextBarber("chaise libre");
+	customerQueue.pop();
+
 	_mutex.unlock();
+	//_interface->consoleAppendTextBarber("fin coupe de cheveu");
+
 }
 
 /********************************************
